@@ -4,6 +4,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "setup-db": "node setup-db.js",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js"
   },
@@ -16,7 +17,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "mysql2": "^3.11.3"
+    "mysql2": "^3.11.3",
+    "socket.io": "^4.7.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
