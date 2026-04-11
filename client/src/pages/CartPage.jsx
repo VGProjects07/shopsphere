@@ -1,0 +1,51 @@
+import { Link } from "react-router-dom";
+import { useStore } from "../context/StoreContext.jsx";
+
+export default function CartPage() {
+  const { state, dispatch } = useStore();
+  const subtotal = state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <div className="page">
+      <section className="section-block narrow">
+        <div className="section-head">
+          <h1>Your Cart</h1>
+          <p>Animated cart updates keep the experience snappy as quantities change.</p>
+        </div>
+        <div className="cart-layout">
+          <div className="cart-list">
+            {state.cart.length ? state.cart.map((item) => (
+              <article key={item.id} className="cart-item">
+                <img src={item.imageUrl} alt={item.name} />
+                <div className="cart-item-details">
+                  <h3>{item.name}</h3>
+                  <p className="cart-item-price">₹{item.price.toFixed(2)} each</p>
+                  <div className="qty-row">
+                    <button type="button" onClick={() => dispatch({ type: "UPDATE_CART", payload: { id: item.id, quantity: Math.max(item.quantity - 1, 1) } })}>-</button>
+                    <span>{item.quantity}</span>
+                    <button type="button" onClick={() => dispatch({ type: "UPDATE_CART", payload: { id: item.id, quantity: Math.min(item.quantity + 1, item.stock) } })}>+</button>
+                  </div>
+                  <p className="cart-item-total">Total: ₹{(item.price * item.quantity).toFixed(2)}</p>
+                  <button type="button" className="ghost-button remove-btn" onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: item.id })}>Remove</button>
+                </div>
+              </article>
+            )) : (
+              <div className="empty-state">
+                <p>Your cart is empty.</p>
+                <Link to="/products" className="primary-button compact">Continue shopping</Link>
+              </div>
+            )}
+          </div>
+          <aside className="summary-card">
+            <h3>Order summary</h3>
+            <div className="summary-row"><span>Items ({totalItems})</span><strong>₹{subtotal.toFixed(2)}</strong></div>
+            <div className="summary-row"><span>Shipping</span><strong>Free</strong></div>
+            <div className="summary-row total-row"><span>Total</span><strong>₹{subtotal.toFixed(2)}</strong></div>
+            <Link to="/checkout" className="primary-button">Proceed to checkout</Link>
+          </aside>
+        </div>
+      </section>
+    </div>
+  );
+}
