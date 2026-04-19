@@ -3,7 +3,7 @@ import { useStore } from "../context/StoreContext.jsx";
 
 export default function CartPage() {
   const { state, dispatch, addToCart, removeFromCart } = useStore();
-  const subtotal = state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = state.cart.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
   const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
