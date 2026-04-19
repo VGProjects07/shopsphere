@@ -3,7 +3,7 @@ import RatingStars from "./RatingStars.jsx";
 import { useStore } from "../context/StoreContext.jsx";
 
 export default function ProductCard({ product }) {
-  const { dispatch, state } = useStore();
+  const { dispatch, state, addToCart } = useStore();
   const wished = state.wishlist.some((item) => item.id === product.id);
 
   return (
@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
           <button
             type="button"
             className="primary-button compact"
-            onClick={() => dispatch({ type: "ADD_TO_CART", payload: { ...product, quantity: 1 } })}
+            onClick={() => addToCart(product, 1)}
           >
             Add
           </button>

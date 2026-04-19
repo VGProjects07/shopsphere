@@ -7,7 +7,7 @@ import { useStore } from "../context/StoreContext.jsx";
 
 export default function ProductDetailsPage() {
   const { slug } = useParams();
-  const { state, dispatch } = useStore();
+  const { state, dispatch, addToCart } = useStore();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -67,7 +67,7 @@ export default function ProductDetailsPage() {
             <span>{product.discountPercent}% off</span>
           </div>
           <div className="cta-row">
-            <button type="button" className="primary-button" onClick={() => dispatch({ type: "ADD_TO_CART", payload: { ...product, quantity: 1 } })}>Add to cart</button>
+            <button type="button" className="primary-button" onClick={() => addToCart(product, 1)}>Add to cart</button>
             <button type="button" className="secondary-button" onClick={() => dispatch({ type: "TOGGLE_WISHLIST", payload: product })}>Save to wishlist</button>
           </div>
         </div>

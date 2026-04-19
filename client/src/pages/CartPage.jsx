@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useStore } from "../context/StoreContext.jsx";
 
 export default function CartPage() {
-  const { state, dispatch } = useStore();
+  const { state, dispatch, addToCart, removeFromCart } = useStore();
   const subtotal = state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -16,18 +16,18 @@ export default function CartPage() {
         <div className="cart-layout">
           <div className="cart-list">
             {state.cart.length ? state.cart.map((item) => (
-              <article key={item.id} className="cart-item">
-                <img src={item.imageUrl} alt={item.name} />
+              <article key={item.product_id} className="cart-item">
+                <img src={item.image_url} alt={item.name} />
                 <div className="cart-item-details">
                   <h3>{item.name}</h3>
-                  <p className="cart-item-price">₹{item.price.toFixed(2)} each</p>
+                  <p className="cart-item-price">₹{parseFloat(item.price).toFixed(2)} each</p>
                   <div className="qty-row">
-                    <button type="button" onClick={() => dispatch({ type: "UPDATE_CART", payload: { id: item.id, quantity: Math.max(item.quantity - 1, 1) } })}>-</button>
+                    <button type="button" onClick={() => addToCart({ id: item.product_id }, Math.max(item.quantity - 1, 1))}>-</button>
                     <span>{item.quantity}</span>
-                    <button type="button" onClick={() => dispatch({ type: "UPDATE_CART", payload: { id: item.id, quantity: Math.min(item.quantity + 1, item.stock) } })}>+</button>
+                    <button type="button" onClick={() => addToCart({ id: item.product_id }, Math.min(item.quantity + 1, item.stock || 99))}>+</button>
                   </div>
-                  <p className="cart-item-total">Total: ₹{(item.price * item.quantity).toFixed(2)}</p>
-                  <button type="button" className="ghost-button remove-btn" onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: item.id })}>Remove</button>
+                  <p className="cart-item-total">Total: ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
+                  <button type="button" className="ghost-button remove-btn" onClick={() => removeFromCart(item.product_id)}>Remove</button>
                 </div>
               </article>
             )) : (

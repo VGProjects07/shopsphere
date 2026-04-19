@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 import { categories, dashboardStats, products, reviews } from "../data/mockData.js";
+import { apiRequest } from "../api/client.js";
 
 const StoreContext = createContext(null);
 
 const savedUser = localStorage.getItem("shopsphere_user");
+const savedToken = localStorage.getItem("shopsphere_token");
 const initialState = {
   user: savedUser ? JSON.parse(savedUser) : null,
-  token: localStorage.getItem("shopsphere_token"),
+  token: savedToken,
   products,
   categories,
   reviews,
@@ -19,6 +21,28 @@ const initialState = {
   loading: false
 };
 
+// Cart API functions
+const fetchCart = async (token) => {
+  try {
+    const cart = await apiRequest("/cart", {}, token);
+    return cart;
+  } catch (error) {
+    console.error("Failed to fetch cart:", error);
+    return [];
+  }
+};
+
+const addToCartAPI = async (productId, quantity, token) => {
+  await apiRequest("/cart", {
+    method: "POST",
+    body: JSON.stringify({ productId, quantity })
+  }, token);
+};
+
+const removeFromCartAPI = async (productId, token) => {
+  await apiRequest(`/cart/${productId}`, { method: "DELETE" }, token);
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "SET_SEARCH":
@@ -27,17 +51,19 @@ const reducer = (state, action) => {
       return { ...state, user: action.payload.user, token: action.payload.token };
     case "LOGOUT":
       return { ...state, user: null, token: null, cart: [], wishlist: [], orders: [] };
+    case "SET_CART":
+      return { ...state, cart: action.payload };
     case "ADD_TO_CART": {
-      const exists = state.cart.find((item) => item.id === action.payload.id);
+      const exists = state.cart.find((item) => item.product_id === action.payload.product_id);
       const cart = exists
-        ? state.cart.map((item) => item.id === action.payload.id ? { ...item, quantity: Math.min(item.quantity + action.payload.quantity, item.stock) } : item)
+        ? state.cart.map((item) => item.product_id === action.payload.product_id ? { ...item, quantity: Math.min(item.quantity + action.payload.quantity, item.stock) } : item)
         : [...state.cart, { ...action.payload }];
       return { ...state, cart, notifications: [...state.notifications, { id: Date.now(), type: 'success', message: `${action.payload.name} added to cart` }] };
     }
     case "UPDATE_CART":
-      return { ...state, cart: state.cart.map((item) => item.id === action.payload.id ? { ...item, quantity: action.payload.quantity } : item) };
+      return { ...state, cart: state.cart.map((item) => item.product_id === action.payload.product_id ? { ...item, quantity: action.payload.quantity } : item) };
     case "REMOVE_FROM_CART":
-      return { ...state, cart: state.cart.filter((item) => item.id !== action.payload), notifications: [...state.notifications, { id: Date.now(), type: 'info', message: 'Item removed from cart' }] };
+      return { ...state, cart: state.cart.filter((item) => item.product_id !== action.payload), notifications: [...state.notifications, { id: Date.now(), type: 'info', message: 'Item removed from cart' }] };
     case "TOGGLE_WISHLIST":
       return state.wishlist.some((item) => item.id === action.payload.id)
         ? { ...state, wishlist: state.wishlist.filter((item) => item.id !== action.payload.id), notifications: [...state.notifications, { id: Date.now(), type: 'info', message: 'Removed from wishlist' }] }
@@ -62,6 +88,15 @@ const reducer = (state, action) => {
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Fetch cart when user logs in
+  useEffect(() => {
+    if (state.user && state.token) {
+      fetchCart(state.token).then(cart => {
+        dispatch({ type: "SET_CART", payload: cart });
+      });
+    }
+  }, [state.user, state.token]);
+
   useEffect(() => {
     if (state.user) {
       localStorage.setItem("shopsphere_user", JSON.stringify(state.user));
@@ -78,7 +113,34 @@ export function StoreProvider({ children }) {
     return () => clearTimeout(timer);
   }, [state.notifications]);
 
-  const value = useMemo(() => ({ state, dispatch }), [state]);
+  // Async action creators
+  const addToCart = async (product, quantity = 1) => {
+    if (!state.token) return;
+    try {
+      await addToCartAPI(product.id, quantity, state.token);
+      // Fetch updated cart from API
+      const updatedCart = await fetchCart(state.token);
+      dispatch({ type: "SET_CART", payload: updatedCart });
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      dispatch({ type: "ADD_NOTIFICATION", payload: { type: "error", message: "Failed to add item to cart" } });
+    }
+  };
+
+  const removeFromCart = async (productId) => {
+    if (!state.token) return;
+    try {
+      await removeFromCartAPI(productId, state.token);
+      // Fetch updated cart from API
+      const updatedCart = await fetchCart(state.token);
+      dispatch({ type: "SET_CART", payload: updatedCart });
+    } catch (error) {
+      console.error("Failed to remove from cart:", error);
+      dispatch({ type: "ADD_NOTIFICATION", payload: { type: "error", message: "Failed to remove item from cart" } });
+    }
+  };
+
+  const value = useMemo(() => ({ state, dispatch, addToCart, removeFromCart }), [state]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
