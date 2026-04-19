@@ -6,6 +6,7 @@ const StoreContext = createContext(null);
 
 const savedUser = localStorage.getItem("shopsphere_user");
 const savedToken = localStorage.getItem("shopsphere_token");
+const savedOrders = localStorage.getItem("shopsphere_orders");
 const initialState = {
   user: savedUser ? JSON.parse(savedUser) : null,
   token: savedToken,
@@ -14,7 +15,7 @@ const initialState = {
   reviews,
   wishlist: [],
   cart: [],
-  orders: [],
+  orders: savedOrders ? JSON.parse(savedOrders) : [],
   dashboardStats,
   searchTerm: "",
   notifications: [],
@@ -60,7 +61,7 @@ const reducer = (state, action) => {
     case "LOGIN":
       return { ...state, user: action.payload.user, token: action.payload.token };
     case "LOGOUT":
-      return { ...state, user: null, token: null, cart: [], wishlist: [], orders: [] };
+      return { ...state, user: null, token: null, cart: [], wishlist: [] };
     case "SET_CART":
       return { ...state, cart: action.payload };
     case "ADD_TO_CART": {
@@ -83,9 +84,12 @@ const reducer = (state, action) => {
       return { ...state, reviews: { ...state.reviews, [action.payload.productId]: [action.payload.review, ...current] }, notifications: [...state.notifications, { id: Date.now(), type: 'success', message: 'Review submitted successfully' }] };
     }
     case "SET_ORDERS":
+      localStorage.setItem("shopsphere_orders", JSON.stringify(action.payload));
       return { ...state, orders: action.payload };
     case "PLACE_ORDER":
-      return { ...state, orders: [action.payload, ...state.orders], cart: [], notifications: [...state.notifications, { id: Date.now(), type: 'success', message: `Order #${action.payload.id} placed successfully` }] };
+      const newOrders = [action.payload, ...state.orders];
+      localStorage.setItem("shopsphere_orders", JSON.stringify(newOrders));
+      return { ...state, orders: newOrders, cart: [], notifications: [...state.notifications, { id: Date.now(), type: 'success', message: `Order #${action.payload.id} placed successfully` }] };
     case "DISMISS_NOTIFICATION":
       return { ...state, notifications: state.notifications.slice(1) };
     case "ADD_NOTIFICATION":
@@ -107,7 +111,10 @@ export function StoreProvider({ children }) {
         dispatch({ type: "SET_CART", payload: cart });
       });
       fetchOrders(state.token).then(orders => {
-        dispatch({ type: "SET_ORDERS", payload: orders });
+        // Only update orders if API returns data, otherwise keep local orders
+        if (orders && orders.length > 0) {
+          dispatch({ type: "SET_ORDERS", payload: orders });
+        }
       });
     }
   }, [state.user, state.token]);
@@ -155,7 +162,15 @@ export function StoreProvider({ children }) {
     }
   };
 
-  const value = useMemo(() => ({ state, dispatch, addToCart, removeFromCart }), [state]);
+  const value = useMemo(() => {
+    const userOrders = state.user ? state.orders.filter(order => order.user_id === state.user.id) : [];
+    return { 
+      state: { ...state, userOrders }, 
+      dispatch, 
+      addToCart, 
+      removeFromCart 
+    };
+  }, [state]);
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 

@@ -11,9 +11,9 @@ export default function OrdersHistoryPage() {
           <h1>Order History</h1>
           <p>Track your past orders and their status.</p>
         </div>
-        {state.orders.length ? (
+        {state.userOrders.length ? (
           <div className="orders-list">
-            {state.orders.map((order) => (
+            {state.userOrders.map((order) => (
               <div key={order.id} className="order-card">
                 <div className="order-header">
                   <div className="summary-row">

@@ -15,6 +15,7 @@ export default function CheckoutPage() {
       // Simulate successful checkout for testing
       const order = {
         id: Date.now(),
+        user_id: state.user.id,
         total_amount: total.toFixed(2),
         payment_method: form.paymentMethod,
         payment_status: 'paid',
