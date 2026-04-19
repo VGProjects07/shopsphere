@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useStore } from "../context/StoreContext.jsx";
 
 export default function CartPage() {
   const { state, dispatch, addToCart, removeFromCart } = useStore();
+  const navigate = useNavigate();
   const subtotal = state.cart.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
   const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -33,7 +34,7 @@ export default function CartPage() {
             )) : (
               <div className="empty-state">
                 <p>Your cart is empty.</p>
-                <Link to="/products" className="primary-button compact">Continue shopping</Link>
+                <button type="button" className="primary-button compact" onClick={() => navigate('/products')}>Continue shopping</button>
               </div>
             )}
           </div>
@@ -42,7 +43,7 @@ export default function CartPage() {
             <div className="summary-row"><span>Items ({totalItems})</span><strong>₹{subtotal.toFixed(2)}</strong></div>
             <div className="summary-row"><span>Shipping</span><strong>Free</strong></div>
             <div className="summary-row total-row"><span>Total</span><strong>₹{subtotal.toFixed(2)}</strong></div>
-            <Link to="/checkout" className="primary-button">Proceed to checkout</Link>
+            <button type="button" className="primary-button" onClick={() => navigate('/checkout')}>Proceed to checkout</button>
           </aside>
         </div>
       </section>

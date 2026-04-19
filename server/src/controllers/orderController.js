@@ -10,7 +10,7 @@ export const checkoutValidation = [
 
 export const getOrders = async (req, res, next) => {
   try {
-    const rows = await query(
+    const orders = await query(
       `
         SELECT id, total_amount, payment_method, payment_status, order_status, shipping_address, created_at
         FROM orders
@@ -19,7 +19,22 @@ export const getOrders = async (req, res, next) => {
       `,
       [req.user.id]
     );
-    res.json(rows);
+
+    // Fetch items for each order
+    for (const order of orders) {
+      const items = await query(
+        `
+          SELECT oi.quantity, oi.price, p.name, p.image_url
+          FROM order_items oi
+          JOIN products p ON p.id = oi.product_id
+          WHERE oi.order_id = ?
+        `,
+        [order.id]
+      );
+      order.items = items;
+    }
+
+    res.json(orders);
   } catch (error) {
     next(error);
   }

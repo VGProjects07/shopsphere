@@ -1,18 +1,45 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useStore } from "../context/StoreContext.jsx";
+import { apiRequest } from "../api/client.js";
 
 export default function CheckoutPage() {
   const { state, dispatch } = useStore();
   const navigate = useNavigate();
   const [form, setForm] = useState({ fullName: state.user?.name || "", address: "", city: "", postalCode: "", paymentMethod: "MockPay" });
-  const total = state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = state.cart.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const order = { id: Date.now(), status: "Pending", total, createdAt: new Date().toLocaleDateString(), shippingAddress: form };
-    dispatch({ type: "PLACE_ORDER", payload: order });
-    navigate("/profile");
+    try {
+      // Simulate successful checkout for testing
+      const order = {
+        id: Date.now(),
+        total_amount: total.toFixed(2),
+        payment_method: form.paymentMethod,
+        payment_status: 'paid',
+        order_status: 'Pending',
+        shipping_address: JSON.stringify({
+          fullName: form.fullName,
+          address: form.address,
+          city: form.city,
+          postalCode: form.postalCode
+        }),
+        created_at: new Date().toISOString(),
+        items: state.cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          image_url: item.image_url
+        }))
+      };
+      
+      dispatch({ type: "PLACE_ORDER", payload: order });
+      navigate("/orders");
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      dispatch({ type: "ADD_NOTIFICATION", payload: { type: "error", message: "Checkout failed. Please try again." } });
+    }
   };
 
   return (

@@ -68,7 +68,8 @@ export default function Navbar() {
         <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
           <NavLink to="/">Home</NavLink>
           <NavLink to="/products">Shop</NavLink>
-          <NavLink to="/cart">Cart ({state.cart.length})</NavLink>
+          {state.user && <NavLink to="/cart">Cart ({state.cart.length})</NavLink>}
+          {state.user && <NavLink to="/orders">Orders</NavLink>}
           {state.user && <NavLink to="/profile">Profile</NavLink>}
           {state.user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
           {state.user ? (

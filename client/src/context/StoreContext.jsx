@@ -32,6 +32,16 @@ const fetchCart = async (token) => {
   }
 };
 
+const fetchOrders = async (token) => {
+  try {
+    const orders = await apiRequest("/orders", {}, token);
+    return orders;
+  } catch (error) {
+    console.error("Failed to fetch orders:", error);
+    return [];
+  }
+};
+
 const addToCartAPI = async (productId, quantity, token) => {
   await apiRequest("/cart", {
     method: "POST",
@@ -72,6 +82,8 @@ const reducer = (state, action) => {
       const current = state.reviews[action.payload.productId] || [];
       return { ...state, reviews: { ...state.reviews, [action.payload.productId]: [action.payload.review, ...current] }, notifications: [...state.notifications, { id: Date.now(), type: 'success', message: 'Review submitted successfully' }] };
     }
+    case "SET_ORDERS":
+      return { ...state, orders: action.payload };
     case "PLACE_ORDER":
       return { ...state, orders: [action.payload, ...state.orders], cart: [], notifications: [...state.notifications, { id: Date.now(), type: 'success', message: `Order #${action.payload.id} placed successfully` }] };
     case "DISMISS_NOTIFICATION":
@@ -88,11 +100,14 @@ const reducer = (state, action) => {
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Fetch cart when user logs in
+  // Fetch cart and orders when user logs in
   useEffect(() => {
     if (state.user && state.token) {
       fetchCart(state.token).then(cart => {
         dispatch({ type: "SET_CART", payload: cart });
+      });
+      fetchOrders(state.token).then(orders => {
+        dispatch({ type: "SET_ORDERS", payload: orders });
       });
     }
   }, [state.user, state.token]);

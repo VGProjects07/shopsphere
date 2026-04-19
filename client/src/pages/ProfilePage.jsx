@@ -31,16 +31,9 @@ export default function ProfilePage() {
           </button>
         </div>
         <div className="profile-card">
-          <h2>Order tracking</h2>
-          {state.orders.length ? state.orders.map((order) => (
-            <div key={order.id} className="order-card">
-              <div className="summary-row">
-                <strong>Order #{order.id}</strong>
-                <span>₹{order.total.toFixed(2)}</span>
-              </div>
-              <OrderTimeline status={order.status} />
-            </div>
-          )) : <p>No orders placed yet.</p>}
+          <h2>Orders</h2>
+          <p>View your order history and track current orders.</p>
+          <a href="/orders" className="primary-button compact">View Orders</a>
         </div>
       </section>
       <section className="section-block">

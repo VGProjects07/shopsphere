@@ -7,6 +7,7 @@ import ProductDetailsPage from "./pages/ProductDetailsPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import OrdersHistoryPage from "./pages/OrdersHistoryPage.jsx";
 import AdminDashboardPage from "./pages/AdminDashboardPage.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { useStore } from "./context/StoreContext.jsx";
@@ -38,6 +39,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersHistoryPage />
               </ProtectedRoute>
             }
           />
