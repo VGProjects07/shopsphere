@@ -6,13 +6,9 @@ ShopSphere is a scalable, full-stack e-commerce web application designed to deli
 
 ## 🎥 Project Demo Video
 
-Watch the demo here:
-https://youtu.be/kiZsBxoWQag
+Watch here: https://youtu.be/kiZsBxoWQag
 
-Or click the thumbnail below:
-
-[![Watch the video](https://img.youtube.com/vi/kiZsBxoWQag/0.jpg)](https://youtu.be/kiZsBxoWQag)
-
+[![Project Demo](https://img.youtube.com/vi/kiZsBxoWQag/0.jpg)](https://youtu.be/kiZsBxoWQag)
 
 ## ✨ Key Features
 
