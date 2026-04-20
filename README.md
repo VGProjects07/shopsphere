@@ -4,7 +4,15 @@
 
 ShopSphere is a scalable, full-stack e-commerce web application designed to deliver a seamless and efficient online shopping experience. The platform supports user authentication, product browsing, cart management, and administrative operations.
 
----
+## 🎥 Project Demo Video
+
+Watch the demo here:
+https://youtu.be/kiZsBxoWQag
+
+Or click the thumbnail below:
+
+[![Watch the video](https://img.youtube.com/vi/kiZsBxoWQag/0.jpg)](https://youtu.be/kiZsBxoWQag)
+
 
 ## ✨ Key Features
 
