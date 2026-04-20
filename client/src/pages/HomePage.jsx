@@ -17,11 +17,10 @@ export default function HomePage() {
     <div className="page">
       <Hero />
       <CategoryChips categories={state.categories} activeCategory={activeCategory} onChange={setActiveCategory} />
-      <ProductCarousel title="Featured right now" products={featured} />
+      <ProductCarousel title="Featured Products" products={featured} />
       <section className="section-block">
         <div className="section-head">
-          <h2>Trending deals</h2>
-          <p>Curated picks with animated cards, fast filters, and wishlist support.</p>
+          <h2>All Products</h2>
         </div>
         <div className="product-grid">
           {filtered.map((product) => <ProductCard key={product.id} product={product} />)}

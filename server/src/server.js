@@ -49,12 +49,12 @@ const bootstrap = async () => {
   try {
     await testConnection();
     httpServer.listen(port, () => {
-      console.log(`\n🚀 Server listening on port ${port}`);
-      console.log(`📡 Real-time Socket.io enabled`);
-      console.log(`🔗 MySQL Database connected\n`);
+      console.log(`\nServer listening on port ${port}`);
+      console.log(`Real-time Socket.io enabled`);
+      console.log(`MySQL Database connected\n`);
     });
   } catch (error) {
-    console.error("✗ Failed to start server:", error.message);
+    console.error("Failed to start server:", error.message);
     process.exit(1);
   }
 };
