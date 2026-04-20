@@ -197,7 +197,7 @@ GitHub: [https://github.com/VGProjects07](https://github.com/VGProjects07)
 1. Clone repository using Git
 2. Install dependencies using npm install
 3. Configure environment variables (.env)
-4. Setup database (MongoDB/MySQL)
+4. Setup database (MySQL)
 5. Run backend using npm start
 6. Run frontend using npm start
 7. Open browser at localhost:3000
@@ -207,3 +207,5 @@ GitHub: [https://github.com/VGProjects07](https://github.com/VGProjects07)
 ## ⭐ Conclusion
 
 ShopSphere demonstrates a complete implementation of a modern e-commerce system using industry-standard technologies. It follows best practices in software architecture, security, and scalability.
+
+<img width="1304" height="2312" alt="Repository_Structure" src="https://github.com/user-attachments/assets/c9110d95-122b-40ed-af8a-30c2ca948e13" />
